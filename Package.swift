@@ -8,7 +8,9 @@ let package = Package(
     ],
     products: [
         .executable(name: "Modafinil", targets: ["Modafinil"]),
-        .executable(name: "ModafinilHelper", targets: ["ModafinilHelper"])
+        .executable(name: "ModafinilHelper", targets: ["ModafinilHelper"]),
+        .executable(name: "Vigil", targets: ["Vigil"]),
+        .executable(name: "VigilDaemon", targets: ["VigilDaemon"])
     ],
     targets: [
         .target(
@@ -27,6 +29,25 @@ let package = Package(
         .executableTarget(
             name: "ModafinilHelper",
             dependencies: ["ModafinilShared"]
+        ),
+        .target(
+            name: "VigilShared"
+        ),
+        .executableTarget(
+            name: "Vigil",
+            dependencies: ["VigilShared"],
+            linkerSettings: [
+                .linkedFramework("AppKit"),
+                .linkedFramework("ServiceManagement")
+            ]
+        ),
+        .executableTarget(
+            name: "VigilDaemon",
+            dependencies: ["VigilShared"],
+            linkerSettings: [
+                .linkedFramework("CoreGraphics"),
+                .linkedFramework("IOKit")
+            ]
         )
     ]
 )
