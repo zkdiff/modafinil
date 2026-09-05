@@ -57,7 +57,6 @@ final class DaemonService: NSObject, NSXPCListenerDelegate {
                 try self.policy.ensureApplied()
                 self.policyActive = true
                 self.lidMonitor.setEnabled(true)
-                self.lidMonitor.turnDisplayOffIfNeeded()
                 reply(true, nil)
             } catch {
                 reply(false, error.localizedDescription)
@@ -96,7 +95,6 @@ final class DaemonService: NSObject, NSXPCListenerDelegate {
             try policy.ensureApplied()
             policyActive = true
             lidMonitor.setEnabled(true)
-            lidMonitor.turnDisplayOffIfNeeded()
             NSLog("VigilDaemon applied sleep-prevention policy (%@)", reason)
         } catch {
             policyActive = false

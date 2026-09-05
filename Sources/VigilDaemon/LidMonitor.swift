@@ -25,7 +25,7 @@ final class LidMonitor {
     private var rootDomain: io_service_t = IO_OBJECT_NULL
     private var notificationPort: IONotificationPortRef?
     private var notifier: io_object_t = IO_OBJECT_NULL
-    private var isEnabled = false
+    private var displayPolicy = LidDisplayPolicy()
 
     deinit {
         stop()
@@ -91,15 +91,13 @@ final class LidMonitor {
     }
 
     func setEnabled(_ enabled: Bool) {
-        isEnabled = enabled
-        if enabled {
-            turnDisplayOffIfNeeded()
+        // IOKit delivers lid events on the main run loop. Serialize activation
+        // with those events so a policy refresh preserves the last lid state.
+        DispatchQueue.main.async {
+            if self.displayPolicy.setEnabled(enabled, lidClosed: self.isLidClosed()) {
+                self.turnDisplayOffForLidClosure()
+            }
         }
-    }
-
-    func turnDisplayOffIfNeeded() {
-        guard isEnabled, isLidClosed() == true, !Self.hasExternalDisplay() else { return }
-        turnDisplayOff()
     }
 
     func isLidClosed() -> Bool? {
@@ -127,8 +125,9 @@ final class LidMonitor {
         let bits = UInt(bitPattern: messageArgument)
         let isClosed = (bits & UInt(kClamshellStateBit)) != 0
 
-        guard isEnabled, isClosed, !Self.hasExternalDisplay() else { return }
-        turnDisplayOff()
+        if displayPolicy.lidChanged(isClosed: isClosed) {
+            turnDisplayOffForLidClosure()
+        }
     }
 
     private static func hasExternalDisplay() -> Bool {
@@ -151,7 +150,9 @@ final class LidMonitor {
         CGDisplayIsBuiltin(display) == 0
     }
 
-    private func turnDisplayOff() {
+    private func turnDisplayOffForLidClosure() {
+        guard !Self.hasExternalDisplay() else { return }
+
         do {
             try Shell.run("/usr/bin/pmset", ["displaysleepnow"])
         } catch {

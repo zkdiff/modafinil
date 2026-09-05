@@ -30,6 +30,7 @@ let package = Package(
             name: "ModafinilHelper",
             dependencies: ["ModafinilShared"]
         ),
+        .testTarget(name: "VigilDaemonTests", dependencies: ["VigilDaemon"]),
         .target(
             name: "VigilShared"
         ),
