@@ -12,7 +12,7 @@ DAEMONS_DIR="$CONTENTS_DIR/Library/LaunchDaemons"
 
 cd "$ROOT_DIR"
 
-if ! security find-identity -v -p codesigning | grep -F "$SIGN_IDENTITY" >/dev/null; then
+if ! security find-identity -v -p codesigning | rg -F "$SIGN_IDENTITY" >/dev/null; then
   echo "Missing signing identity: $SIGN_IDENTITY" >&2
   echo "For local development, pass your own Apple Development identity:" >&2
   echo "  SIGN_IDENTITY=\"Apple Development: Your Name (TEAMID)\" $0" >&2

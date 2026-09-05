@@ -1,0 +1,10 @@
+version = 1
+name = "Vigil"
+
+[setup]
+script = ""
+
+[[actions]]
+name = "Run"
+icon = "run"
+command = "SIGN_IDENTITY=\"Apple Development: Daniel Martinez (4NCE6T4M28)\" ./script/build_and_run.sh"
